@@ -1,48 +1,38 @@
 import { useState, useEffect } from "react";
-import Form from "./Form";
-import Message from "./Message";
+import Header from "./Header";
+import MovieRows from "./MovieRows";
+import $ from 'jquery'
+
+//API key:  a126cd1f2982a654071c46e924f9f9f1
 
 function App() {
-  const [weight, setWeight] = useState("");
-  const [height, setHeight] = useState("");
-  const [BMI, setBMI] = useState("");
-  const [notice, setNotice] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [UrlString, setUrlString] = useState('https://api.themoviedb.org/3/search/movie?query=marvel&&api_key=a126cd1f2982a654071c46e924f9f9f1')
+  useEffect(()=>{
+    loadFilmAPI();
+  },[UrlString]);
 
-  useEffect (() =>{
-    messageOutput();
-  }, [BMI]);
-
-  const messageOutput = () => {
-    if(BMI === ""){
-      setNotice("");
-    }
-    else if(BMI<18.5) {
-      setNotice("Underweight! You should eat more!")
-    }
-    else if(18.5 <= BMI && BMI < 24.9) {
-      setNotice("You have a great BMI! Keep going!")
-    }
-    else if(24.9 <= BMI && BMI < 29.9) {
-      setNotice("You are Overweight! You should go on a diet!")
-    }
-    else {
-      setNotice("Dangerous Zone! !!!You are obese!!!");
-    }
+  const loadFilmAPI = () => {
+    $.ajax({
+      url: UrlString,
+      success: (searchResults) => {
+        console.log("Fetched data successfully");
+        setMovies(searchResults.results);
+      },
+      error: (xhr, status, err) => {
+        console.log("Failed to fetch data");
+      }
+    })
   }
+
   return (
     <div className="App">
-      <header><h1>Monkie_J BMI Calculator</h1></header>
-      <Form
-        weight = {weight}
-        setWeight = {setWeight}
-        height = {height}
-        setHeight = {setHeight}
-        setBMI = {setBMI}
-      ></Form>
-      <Message
-        BMI = {BMI}
-        notice = {notice}
-      ></Message>
+      <Header
+        setUrlString = {setUrlString}
+      ></Header>
+      <MovieRows 
+        movies = {movies}
+      ></MovieRows>
     </div>
   );
 }
